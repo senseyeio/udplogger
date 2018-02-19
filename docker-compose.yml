@@ -1,0 +1,15 @@
+version: '2.1'
+
+services:
+  sut:
+    build: .
+    environment:
+      - PORT=8125
+
+  tester:
+    image: subfuzion/netcat
+    depends_on:
+      sut:
+        condition: service_healthy
+    entrypoint: "/bin/ash"
+    command: "-c 'nc -u -w1 sut 8125 < /etc/alpine-release'"
