@@ -32,7 +32,7 @@ services:
       statsd:
         condition: service_healthy
     entrypoint: "/bin/ash"
-    command: "-c 'nc -u -w1 sut 8125 < /etc/alpine-release'"
+    command: "-c 'nc -u -w1 statsd 8125 < /etc/alpine-release'"
 ```
 
 You can also run it as a single docker container:
