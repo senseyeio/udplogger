@@ -4,15 +4,15 @@ flags := -p test
 test:
 	docker-compose $(flags) build
 	docker-compose $(flags) up --force-recreate --remove-orphans -d
-	docker wait test_tester_1 > test-return-value
-	docker-compose $(flags) kill -s SIGTERM
+	docker wait test_client-example_1 > test-return-value
+	docker-compose $(flags) stop
 	docker-compose $(flags) logs -f
 	docker-compose $(flags) rm -v --force
 	exit `cat test-return-value`
 
 .PHONY: kill
 kill:
-	docker-compose $(flags) kill -s SIGINT
+	docker-compose $(flags) kill
 	docker-compose $(flags) rm -v --force
 
 .PHONY: clean

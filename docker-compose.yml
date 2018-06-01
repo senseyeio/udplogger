@@ -1,15 +1,20 @@
 version: '2.1'
 
 services:
-  sut:
+  udplogger:
     build: .
     environment:
-      - PORT=8125
+      - PORT=12345
+    healthcheck:
+      test: ["CMD", "/bin/healthcheck"]
+      interval: 250ms
+      timeout: 250ms
+      retries: 7
 
-  tester:
+  client-example:
     image: subfuzion/netcat
     depends_on:
-      sut:
+      udplogger:
         condition: service_healthy
     entrypoint: "/bin/ash"
-    command: "-c 'nc -u -w1 sut 8125 < /etc/alpine-release'"
+    command: "-c 'echo -n hi! | nc -u -w1 udplogger 12345'"
