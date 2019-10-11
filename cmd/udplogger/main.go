@@ -12,6 +12,8 @@ import (
 	"github.com/senseyeio/udplogger"
 )
 
+var raw bool
+
 func main() {
 	log.SetFlags(0)
 	log.SetOutput(new(logger))
@@ -25,6 +27,7 @@ func main() {
 		os.Exit(0)
 	}()
 
+	raw = udplogger.Raw()
 	addr, err := udplogger.Addr()
 	if err != nil {
 		log.Fatal(err)
@@ -42,7 +45,12 @@ func main() {
 		if err != nil {
 			log.Fatal("reading from UDP socket: ", err)
 		}
-		log.Printf("received: %q\n", string(buf[:rlen]))
+		str := string(buf[:rlen])
+		if raw {
+			log.Print(str)
+		} else {
+			log.Printf("received: %q\n", str)
+		}
 	}
 	os.Exit(1)
 }
@@ -50,7 +58,11 @@ func main() {
 type logger struct{}
 
 func (_ logger) Write(b []byte) (int, error) {
-	return fmt.Print(time.Now().UTC().Format(format) + " " + string(b))
+	if raw {
+		return fmt.Print(string(b))
+	} else {
+		return fmt.Print(time.Now().UTC().Format(format) + " " + string(b))
+	}
 }
 
 // RFC3339 with milliseconds and right 0 padding.

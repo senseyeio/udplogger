@@ -30,3 +30,11 @@ func Addr() (*net.UDPAddr, error) {
 		IP:   net.ParseIP("0.0.0.0"),
 	}, nil
 }
+
+func Raw() bool {
+	val, ok := os.LookupEnv("RAW")
+	if !ok {
+		return false
+	}
+	return val == "on"
+}
