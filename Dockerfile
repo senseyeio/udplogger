@@ -6,7 +6,7 @@ ARG healthcheck=/bin/healthcheck
 
 ####
 # Creates a Docker image with the sources.
-FROM golang:1.10.2-alpine3.7 AS src
+FROM golang:1.13.5-alpine3.10 AS src
 ARG src
 
 # Copy the sources.
