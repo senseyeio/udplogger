@@ -2,16 +2,16 @@
 ARG name=udplogger
 
 ####
-# Creates a Docker image with the sources.
+# Creates a Docker image to build the command.
 FROM golang:1.13.5-alpine3.10 AS build
 ARG name
 
 WORKDIR /tmp/src
 
+ENV CGO_ENABLED 0
+
 # Copy the sources.
 COPY . .
-
-ENV CGO_ENABLED 0
 
 RUN go build \
     -o /bin/healthcheck \
@@ -24,7 +24,7 @@ RUN go build \
     ./cmd/${name}
 
 ####
-# Creates a single layer image to run the service.
+# Creates a single layer image to run the command as /bin/entrypoint
 FROM scratch as run
 ARG name
 
