@@ -1,41 +1,33 @@
-# Creates a Docker image for running the service.
+# the name of the command to build
 ARG name=udplogger
-ARG src=github.com/senseyeio/udplogger
-ARG bin=/bin/${name}
-ARG healthcheck=/bin/healthcheck
 
 ####
 # Creates a Docker image with the sources.
-FROM golang:1.13.5-alpine3.10 AS src
-ARG src
+FROM golang:1.13.5-alpine3.10 AS build
+ARG name
+
+WORKDIR /tmp/src
 
 # Copy the sources.
-COPY . /tmp/${src}
+COPY . .
 
-####
-# Creates a Docker image with a static binary of the service.
-FROM src as build
-ARG bin
-ARG name
-ARG src
-ARG healthcheck
+ENV CGO_ENABLED 0
 
-WORKDIR /tmp/${src}
-RUN CGO_ENABLED=0 go build \
-    -o ${healthcheck} \
+RUN go build \
+    -o /bin/healthcheck \
     -ldflags '-extldflags "-static"' \
     ./cmd/healthcheck
-RUN CGO_ENABLED=0 go build \
-    -o ${bin} \
+
+RUN go build \
+    -o /bin/${name} \
     -ldflags '-extldflags "-static"' \
     ./cmd/${name}
 
 ####
 # Creates a single layer image to run the service.
 FROM scratch as run
-ARG bin
-ARG healthcheck
+ARG name
 
-COPY --from=build ${healthcheck} ${healthcheck}
-COPY --from=build ${bin} ${bin}
-ENTRYPOINT ["/bin/udplogger"]
+COPY --from=build /bin/healthcheck /bin/healthcheck
+COPY --from=build /bin/${name} /bin/entrypoint
+ENTRYPOINT ["/bin/entrypoint"]
