@@ -10,7 +10,7 @@ FROM golang:1.13.5-alpine3.10 AS src
 ARG src
 
 # Copy the sources.
-COPY . /go/src/${src}
+COPY . /tmp/${src}
 
 ####
 # Creates a Docker image with a static binary of the service.
@@ -20,7 +20,7 @@ ARG name
 ARG src
 ARG healthcheck
 
-WORKDIR /go/src/${src}
+WORKDIR /tmp/${src}
 RUN CGO_ENABLED=0 go build \
     -o ${healthcheck} \
     -ldflags '-extldflags "-static"' \
